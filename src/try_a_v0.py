@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-
+素で通しで書く
 
 Kengo NAKADA:
 https://github.com/shimane-dev, https://github.com/kengo-nakada

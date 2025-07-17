@@ -47,7 +47,7 @@ async def pick_and_place(client, place: bool, _logger):
     if place:
         await client.hand_move_A(30, 100)
     else:
-        await client.hand_move_H(6, True, "Speed = 30")
+        await client.hand_move_H(6, True)
     await asyncio.sleep(3)
 
 
