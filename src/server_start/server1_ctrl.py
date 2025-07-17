@@ -13,7 +13,7 @@ from fastapi_frame.api_server import FastApiServer
 from x_logger.x_logger import XLogger
 
 
-if __name__ == "__main__":
+def server_start():
     Config.load_yaml("config_server1.yaml")
     logger = XLogger(log_level="debug", logger_name=Config.COBOTTA_SERVER_LOGGER_NAME)
 
@@ -34,3 +34,7 @@ if __name__ == "__main__":
         lifespan_msg_prefix="COBOTTA",
     )
     server.run(host=Config.SERVER_IP, port=Config.SERVER_PORT)
+
+
+if __name__ == "__main__":
+    server_start()

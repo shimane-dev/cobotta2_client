@@ -6,7 +6,7 @@ Kengo NAKADA:
 https://github.com/shimane-dev, https://github.com/kengo-nakada
 kengo.nakada@mat.shimane-u.ac.jp, kengo.nakada@gmail.com
 """
-import pytest
+# import pytest
 import asyncio
 
 import logging
@@ -23,8 +23,8 @@ Config.load_yaml("config_server1.yaml")
 _logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
 
 
-@pytest.mark.asyncio
-async def test_fastapi_state():
+# @pytest.mark.asyncio
+async def main():
     await worker(_logger)
 
 
@@ -121,4 +121,6 @@ async def worker(_logger):
     except Exception as e:
         _logger.error(f"error: {e}")
 
-    assert "result" == "result"
+
+if __name__ == "__main__":
+    asyncio.run(main())
