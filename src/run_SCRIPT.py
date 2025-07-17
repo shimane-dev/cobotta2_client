@@ -1,22 +1,24 @@
 #!/usr/bin/env python
 """
+
 Kengo NAKADA:
 https://github.com/shimane-dev, https://github.com/kengo-nakada
 kengo.nakada@mat.shimane-u.ac.jp, kengo.nakada@gmail.com
 """
-import pytest
+# import pytest
+import asyncio
 
 
-@pytest.mark.asyncio
-async def test_fastapi_Async_move_A_30():
+# @pytest.mark.asyncio
+async def main():
     import logging
 
     # httpx のログを WARNING レベル以上にする（INFO を抑制）
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
+    import time
     from cobotta2.config import Config
     from cobotta2.server_fastapi.clients import AsyncCobottaClient
-    from cobotta2.server_fastapi.models.motion import MotionMode
     from x_logger.x_logger import XLogger
 
     Config.load_yaml("config_server1.yaml")
@@ -25,20 +27,20 @@ async def test_fastapi_Async_move_A_30():
     client = AsyncCobottaClient(config=Config, logger=_logger)
     await client.reset_error()
 
-    # speed の入手などには take_arm が必要(アームごとのパラメータなので)
-    ret = await client.take_arm()
-    assert ret is not None, "接続失敗"
+    # name = "script\Pro2"
+    # name = "pacscript\P_P62"
+    # name = "pacscript\P_P63"
+    name = "P_P62"
 
-    ret = await client.turn_on_motor()
-    assert ret is not None, "接続失敗"
+    # 拡張子は必要ない
+    _logger.info(f"== take script({name})")
+    await client.take_script(name)
 
-    ###########################################
-    await client.hand_move_A(30, 100)
-    ###########################################
-
-    assert ret is not None, "接続失敗"
+    _logger.info(f"== run_script: {name}")
+    await client.run_script()
     await client.wait_for_complete()
 
-    # current_pos = await client.get_current_pos()
-    # _logger.info(f"current_position: {current_pos}")
-    assert "result" == "result"
+    time.sleep(0.1)
+
+if __name__ == "__main__":
+    asyncio.run(main())

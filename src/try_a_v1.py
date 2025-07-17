@@ -25,67 +25,58 @@ from x_logger import XLogger
 # @pytest.mark.asyncio
 async def main():
     Config.load_yaml("config_server1.yaml")
-    _logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
 
-    await worker(_logger)
+    await worker(logger)
 
 
-async def hand_open(client, _logger):
+async def hand_open(client, logger: XLogger = None,):
     # await client.hand_move_H(6, True)
     await client.hand_move_A(30, 100)
     # await asyncio.sleep(3)
 
 
-async def init(client, _logger):
-    await hand_open(client, _logger)
+async def init(client, logger: XLogger = None,):
+    await hand_open(client, logger)
     await client.move("P120", bstrOpt="Speed=60")  # home
     await client.move("P121", bstrOpt="Speed=100")  # home
 
 
-async def pick_and_place(client, place: bool, _logger):
-
+async def pick_and_place(client, place: bool= False, pick: bool= False, logger: XLogger = None,):
     if place:
         await client.hand_move_A(30, 100)
-    else:
-        await client.hand_move_H(6, True, "Speed = 30")
+
+    if pick:
+        await client.hand_move_H(6, True)
     await asyncio.sleep(3)
 
 
-async def move_to_home(client, _logger):
-    """
-    home へ移動
+async def move_to_home(client, *, logger: XLogger = None,):
+    """ """
+    await client.move("P122", bstrOpt="Speed=100")
 
-    Args:
-        client:
-        _logger:
 
-    Returns:
-
-    """
-    await client.move("P122", bstrOpt="Speed=100")  # home
-
+async def approach_to_sample(client, *, logger: XLogger = None,):
     # sample の直上へ
-    await client.move("P123", bstrOpt="Speed=65")  # home
+    await client.move("P123", bstrOpt="Speed=65")  # もっと近く
     await client.wait_for_complete()
 
-    # 手動でサンプルの位置調整
-    await asyncio.sleep(3)
 
-
-async def move_to_scale(client, _logger):
+async def move_to_scale(client, *, logger: XLogger = None,):
     await client.move("P124", bstrOpt="Speed=65")  # 持ち上げたところ
     await client.move("P125", bstrOpt="Speed=65")  #
     await client.move("P126", bstrOpt="Speed=65")  #
 
 
-async def process_in_shield(client, place: bool, _logger):
+async def process_in_shield(client, *, place: bool=False, pick: bool = False, logger: XLogger=None):
     """
     風防のなかに突入して place する
 
     Args:
         client:
-        place (bool): Place (True), Pick (False)
-        _logger:
+        place (bool):
+        pick (bool):
+        logger:
 
     Returns:
 
@@ -102,7 +93,8 @@ async def process_in_shield(client, place: bool, _logger):
         # Place
         await client.hand_move_A(30, 100)
         await client.move("@0 P129+(0,0,5)")
-    else:
+
+    if pick:
         # Pick
         await client.hand_move_H(6, True)
         await asyncio.sleep(5)
@@ -119,17 +111,15 @@ async def process_in_shield(client, place: bool, _logger):
     await client.move("P134", bstrOpt="Speed=100")  # もうすこし安全まで移動
 
 
-async def reset_scale_zero(client, _logger):
+async def reset_scale_zero(client, *, logger: XLogger = None,):
     """ Motion は Line 想定 """
-    _logger.info("=== push button (pre)")
-
     await client.move("P135", bstrOpt="Speed=100")  # 準備
     await client.move("P136", bstrOpt="Speed=100")  # 準備
 
     await client.move("P137", bstrOpt="Speed=100")  # ボタンの直情
     # time.sleep(3)
 
-    _logger.info("=== push button")
+    # === Push Button
     # Motion は line を想定
     await client.move("P138", bstrOpt="Speed=30")  # 押す
 
@@ -141,16 +131,9 @@ async def reset_scale_zero(client, _logger):
     await client.move("P140", bstrOpt="Speed=100")  #
 
 
-async def release(client, _logger):
-    await client.move("P122", bstrOpt="Speed=50")  # home
-    await client.move("P123", bstrOpt="Speed=30")  # home
-    await client.hand_move_A(30, 100)
-    await asyncio.sleep(5)
-
-
-async def worker(_logger):
+async def worker(logger: XLogger = None,):
     """"""
-    client = AsyncCobottaClient(config=Config, logger=_logger)
+    client = AsyncCobottaClient(config=Config, logger=logger)
     await client.reset_error()
 
     try:
@@ -158,37 +141,45 @@ async def worker(_logger):
         await client.take_arm()
         await client.turn_on_motor()
 
-        await hand_open(client, _logger)
+        await hand_open(client)
 
         client.motion_mode = MotionMode.PTP
+        await init(client)  # init
 
-        await init(client, _logger)  # init
-        await move_to_home(client, _logger)
-        await pick_and_place(client, False, _logger)  # Pick
+        ########### sample を pick
+        await move_to_home(client)
+        await approach_to_sample(client)
+        await pick_and_place(client, pick=True)  # Pick
 
-        await move_to_scale(client, _logger)  # 電子天秤の手前まで
+        ########### 電子天秤の手前まで
+        await move_to_scale(client)
         # input("please input key...")
 
+        ########### Place ############
         client.motion_mode = MotionMode.LINE
-        await process_in_shield(client, True, _logger)  # 電子天秤に突っ込む
+        await process_in_shield(client, place=True)  # 電子天秤に突っ込む
 
+        ########### Zero Reset ########
         client.motion_mode = MotionMode.LINE
-        await reset_scale_zero(client, _logger)  # 電子天秤のゼロリセット
+        await reset_scale_zero(client)  # 電子天秤のゼロリセット
 
-        await move_to_scale(client, _logger)  # 電子天秤の手前まで
+        ########### 電子天秤の手前まで
+        await move_to_scale(client)
 
+        ########### 天秤においてあるsampleをとる
         client.motion_mode = MotionMode.LINE
-        await hand_open(client, _logger)
-        await process_in_shield(client, False, _logger)  # 電子天秤に突っ込む
+        await hand_open(client) # 念のため
+        await process_in_shield(client, pick=True)  # 電子天秤に突っ込む
 
-        await move_to_home(client, _logger)
-        await hand_open(client, _logger)
+        ######### ホームにsampleを返す
+        await move_to_home(client)
+        await approach_to_sample(client)
+        await pick_and_place(client, place=True)
 
-        # # await release(client, _logger)
-
+        await move_to_home(client)
 
     except Exception as e:
-        _logger.error(f"error: {e}")
+        logger.error(f"error: {e}")
 
 
 if __name__ == "__main__":
