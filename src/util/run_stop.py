@@ -20,13 +20,17 @@ async def main():
     from cobotta2.server_fastapi.clients import AsyncCobottaClient
     from x_logger.x_logger import XLogger
 
-    Config.load_yaml("config_server1.yaml")
+    Config.load_yaml("../config_server1.yaml")
 
-    _logger = XLogger(log_level="debug", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    _logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=_logger)
 
-    _logger.info("== reset error")
-    await client.reset_error()
+    # _logger.info("== take arm()")
+    # await client.take_arm()
+    # _logger.info("== turn on motor()")
+    # await client.turn_on_motor()
+    _logger.info("== stop()")
+    await client.stop()
 
 
 if __name__ == "__main__":
