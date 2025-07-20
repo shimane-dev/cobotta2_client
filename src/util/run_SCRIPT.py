@@ -23,20 +23,17 @@ async def main():
 
     Config.load_yaml("../config_server1.yaml")
 
-    _logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=_logger)
     await client.reset_error()
 
-    # name = "script\Pro2"
-    # name = "pacscript\P_P62"
-    # name = "pacscript\P_P63"
     name = "P_P62"
 
     # 拡張子は必要ない
-    _logger.info(f"== take script({name})")
+    logger.info(f"== take script({name})")
     await client.take_script(name)
 
-    _logger.info(f"== run_script: {name}")
+    logger.info(f"== run_script: {name}")
     await client.run_script()
     await client.wait_for_complete()
 

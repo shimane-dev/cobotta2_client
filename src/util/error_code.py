@@ -24,14 +24,14 @@ async def main():
 
     Config.load_yaml("../config_server1.yaml")
 
-    _logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=_logger)
 
     try:
         # busy_status などの問い合わせは take arm しないほうがいい。
         result = await client.error_code()
-        _logger.info(type(result))
-        _logger.info(result)
+        logger.info(type(result))
+        logger.info(result)
     except Exception as e:
         print(e)
 

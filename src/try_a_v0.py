@@ -20,12 +20,12 @@ from cobotta2.server_fastapi.models.motion import MotionMode
 from x_logger import XLogger
 
 Config.load_yaml("config_server1.yaml")
-_logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
 
 
 # @pytest.mark.asyncio
 async def main():
-    await worker(_logger)
+    await worker(logger)
 
 
 async def pick(client, _logger):

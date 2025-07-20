@@ -22,7 +22,7 @@ async def main():
 
     Config.load_yaml("../config_server1.yaml")
 
-    _logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=_logger)
     await client.reset_error()
 
@@ -33,9 +33,7 @@ async def main():
     ret = await client.turn_on_motor()
     assert ret is not None, "接続失敗"
 
-    ###########################################
     await client.hand_move_A(30, 100)
-    ###########################################
 
     assert ret is not None, "接続失敗"
     await client.wait_for_complete()
