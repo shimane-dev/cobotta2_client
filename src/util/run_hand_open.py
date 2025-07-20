@@ -41,5 +41,6 @@ async def main():
     # current_pos = await client.get_current_pos()
     # _logger.info(f"current_position: {current_pos}")
 
+
 if __name__ == "__main__":
     asyncio.run(main())
