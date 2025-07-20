@@ -1,41 +1,39 @@
 #!/usr/bin/env python
 """
+内部変数値を読んで、それを配列に入れなおして、そこに移動する
 
 Kengo NAKADA:
 https://github.com/shimane-dev, https://github.com/kengo-nakada
 kengo.nakada@mat.shimane-u.ac.jp, kengo.nakada@gmail.com
 """
-# import pytest
+import pytest
 import asyncio
 
 
-# @pytest.mark.asyncio
-async def main():
+@pytest.mark.asyncio
+async def test_fastapi_Async_move_A_30():
     import logging
 
     # httpx のログを WARNING レベル以上にする（INFO を抑制）
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
-    import time
     from cobotta2.config import Config
     from cobotta2.server_fastapi.clients import AsyncCobottaClient
     from cobotta2.server_fastapi.models.motion import MotionMode
     from x_logger.x_logger import XLogger
 
-    Config.load_yaml("../config_server1.yaml")
+    Config.load_yaml("config_server1.yaml")
 
-    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    _logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=_logger)
+    await client.reset_error()
 
-    try:
-        # busy_status などの問い合わせは take arm しないほうがいい。
-        result = await client.error_description()
-        logger.info(type(result))
-        logger.info(result)
-        print(result)
-    except Exception as e:
-        print(e)
+    # await client.take_arm()
+    # await client.turn_on_motor()
 
+    await client.hand_move_H(6, True)
+    await asyncio.sleep(2)
 
-if __name__ == "__main__":
-    asyncio.run(main())
+    # current_pos = await client.get_current_pos()
+    # _logger.info(f"current_position: {current_pos}")
+    assert "result" == "result"

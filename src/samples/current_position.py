@@ -16,21 +16,26 @@ async def main():
     # httpx のログを WARNING レベル以上にする（INFO を抑制）
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
+    import time
     from cobotta2.config import Config
     from cobotta2.server_fastapi.clients import AsyncCobottaClient
+    from cobotta2.server_fastapi.models.motion import MotionMode
     from x_logger.x_logger import XLogger
 
     Config.load_yaml("../config_server1.yaml")
 
-    _logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
-    client = AsyncCobottaClient(config=Config, logger=_logger)
+    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    client = AsyncCobottaClient(config=Config, logger=logger)
 
-    # _logger.info("== take arm()")
-    # await client.take_arm()
-    # _logger.info("== turn on motor()")
-    # await client.turn_on_motor()
-    _logger.info("== stop()")
-    await client.stop()
+    try:
+        # busy_status などの問い合わせは take arm しないほうがいい。
+        result = await client.current_position()
+        logger.info(type(result))
+        logger.info(result)
+    except Exception as e:
+        print(e)
+    # assert "result" == "result"
+    # send_command("unknown")  # これはエラーになる
 
 
 if __name__ == "__main__":

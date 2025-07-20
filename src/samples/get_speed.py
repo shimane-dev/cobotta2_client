@@ -22,18 +22,23 @@ async def main():
     from cobotta2.server_fastapi.models.motion import MotionMode
     from x_logger.x_logger import XLogger
 
-    Config.load_yaml("../config_server1.yaml")
+    Config.load_yaml("config_server1.yaml")
 
     logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
-    client = AsyncCobottaClient(config=Config, logger=_logger)
+    client = AsyncCobottaClient(config=Config, logger=logger)
 
-    try:
-        # busy_status などの問い合わせは take arm しないほうがいい。
-        result = await client.error_code()
-        logger.info(type(result))
-        logger.info(result)
-    except Exception as e:
-        print(e)
+    await client.take_arm()
+    ret = await client.turn_on_motor()
+    assert ret is not None, "接続失敗"
+
+    logger.info("== run speed()")
+    speed = await client.get_speed()
+    jspeed = await client.get_jspeed()
+    extspeed = await client.get_extspeed()
+    logger.info(f"speed={speed}, extspeed={extspeed}, jspeed={jspeed},")
+
+    # assert "result" == "result"
+    # send_command("unknown")  # これはエラーになる
 
 
 if __name__ == "__main__":
