@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 """
+try_a_v02.py (version 0.0.4)
+
 frame 0.3.0
 cobotta 0.5.5
 

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2025.07.20, v0.0.4  nakada
+
+- try_a_v02
+ 
 ## 2025.07.20, v0.0.3  nakada
  
 - file save
