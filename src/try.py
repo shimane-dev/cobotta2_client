@@ -8,6 +8,7 @@ https://github.com/shimane-dev, https://github.com/kengo-nakada
 kengo.nakada@mat.shimane-u.ac.jp, kengo.nakada@gmail.com
 """
 # import pytest
+import sys
 import asyncio
 import multiprocessing
 
@@ -44,8 +45,13 @@ async def init(
     logger: XLogger = None,
 ):
     await hand_open(client, logger)
-    await client.move("P120", bstrOpt="Speed=100")  # home
-    await client.move("P121", bstrOpt="Speed=100")  # home
+    # await client.move("P120", speed=50, Next=True)  # home
+    # await client.move("P120", speed=50, Next=False)  # home
+    # await client.move("P120", bstrOpt=70)  # home
+    # await client.move("P120+(0,0,10)")  # home
+    # await client.move("P120+(0,0,10)", speed=90)  # home
+    await client.move("P120+(0,0,10)")  # home
+    # await client.move("P121", speed=50)  # home
 
 
 async def pick_and_place(
@@ -68,7 +74,7 @@ async def move_to_home(
     logger: XLogger = None,
 ):
     """ """
-    await client.move("P122", bstrOpt="Speed=100")
+    await client.move("P122")
 
 
 async def approach_to_sample(
@@ -77,7 +83,7 @@ async def approach_to_sample(
     logger: XLogger = None,
 ):
     # sample の直上へ
-    await client.move("P123", bstrOpt="Speed=100")  # もっと近く
+    await client.move("P123")  # もっと近く
     await client.wait_for_complete()
 
 
@@ -86,9 +92,9 @@ async def move_to_scale(
     *,
     logger: XLogger = None,
 ):
-    await client.move("P124", bstrOpt="Speed=100")  # 持ち上げたところ
-    await client.move("P125", bstrOpt="Speed=100")  #
-    await client.move("P126", bstrOpt="Speed=100")  #
+    await client.move("P124")  # 持ち上げたところ
+    await client.move("P125")  #
+    await client.move("P126")  #
 
 
 async def process_in_shield(
@@ -107,12 +113,12 @@ async def process_in_shield(
 
     """
     # 突入(風防をまたぐ)
-    await client.move("P127", bstrOpt="Speed=100")  #
+    await client.move("P127")  #
 
     # in shield
     # Approach
-    await client.move("P128", bstrOpt="Speed=100")  #  アプローチ手前
-    await client.move("P129", bstrOpt="Speed=100")  #
+    await client.move("P128")  #  アプローチ手前
+    await client.move("P129")  #
 
     if place:
         # Place
@@ -126,16 +132,14 @@ async def process_in_shield(
         await client.move("@0 P129+(0,0,10)")
 
     # 外にひく1
-    await client.move("P130+(0,0,10)", bstrOpt="Speed=100")
+    await client.move("P130+(0,0,10)")
 
-    await client.move("P131", bstrOpt="Speed=100")  # ひく(まだ風防のなかに指先がある)
-    await client.move("P132", bstrOpt="Speed=100")  # ひく(これで一応完全に外)
+    await client.move("P131")  # ひく(まだ風防のなかに指先がある)
+    await client.move("P132")  # ひく(これで一応完全に外)
 
     # 他のところに行けるような位置まで移動
-    await client.move(
-        "P133", bstrOpt="Speed=100"
-    )  # 外でアームを回転させて home へ移動しようとしている
-    await client.move("P134", bstrOpt="Speed=100")  # もうすこし安全まで移動
+    await client.move("P133")  # 外でアームを回転させて home へ移動しようとしている
+    await client.move("P134")  # もうすこし安全まで移動
 
 
 async def reset_scale_zero(
@@ -144,22 +148,22 @@ async def reset_scale_zero(
     logger: XLogger = None,
 ):
     """Motion は Line 想定"""
-    await client.move("P135", bstrOpt="Speed=100")  # 準備
-    await client.move("P136", bstrOpt="Speed=100")  # 準備
+    await client.move("P135")  # 準備
+    await client.move("P136")  # 準備
 
-    await client.move("P137", bstrOpt="Speed=100")  # ボタンの直情
+    await client.move("P137")  # ボタンの直情
     # time.sleep(3)
 
     # === Push Button
     # Motion は line を想定
-    await client.move("P138", bstrOpt="Speed=100")  # 押す
+    await client.move("P138")  # 押す
 
     # Motion は line を想定
-    await client.move("P138+(0,0,-1)", bstrOpt="Speed=100")  # 押す
-    await client.move("P138+(0,0,2)", bstrOpt="Speed=100")
+    await client.move("P138+(0,0,-1)")  # 押す
+    await client.move("P138+(0,0,2)")
 
-    await client.move("P139", bstrOpt="Speed=100")  # 直情退避
-    await client.move("P140", bstrOpt="Speed=100")  #
+    await client.move("P139")  # 直情退避
+    await client.move("P140")  #
 
 
 async def worker(
@@ -171,45 +175,16 @@ async def worker(
 
     try:
         # speed の入手などには take_arm が必要(アームごとのパラメータなので)
-        await client.take_arm()
+        ret = await client.take_arm()
+        if ret is None:
+            sys.exit(-1)
+
         await client.turn_on_motor()
 
         await hand_open(client)
 
         client.motion_mode = MotionMode.PTP
         await init(client)  # init
-
-        ########### sample を pick
-        await move_to_home(client)
-        await approach_to_sample(client)
-        await pick_and_place(client, pick=True)  # Pick
-
-        ########### 電子天秤の手前まで
-        await move_to_scale(client)
-        # input("please input key...")
-
-        ########### Place ############
-        client.motion_mode = MotionMode.LINE
-        await process_in_shield(client, place=True)  # 電子天秤に突っ込む
-
-        ########### Zero Reset ########
-        client.motion_mode = MotionMode.LINE
-        await reset_scale_zero(client)  # 電子天秤のゼロリセット
-
-        ########### 電子天秤の手前まで
-        await move_to_scale(client)
-
-        ########### 天秤においてあるsampleをとる
-        client.motion_mode = MotionMode.LINE
-        await hand_open(client)  # 念のため
-        await process_in_shield(client, pick=True)  # 電子天秤に突っ込む
-
-        ######### ホームにsampleを返す
-        await move_to_home(client)
-        await approach_to_sample(client)
-        await pick_and_place(client, place=True)
-
-        await move_to_home(client)
 
     except Exception as e:
         logger.error(f"error: {e}")
