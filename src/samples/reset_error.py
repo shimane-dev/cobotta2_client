@@ -20,7 +20,7 @@ async def main():
     from cobotta2.server_fastapi.clients import AsyncCobottaClient
     from x_logger.x_logger import XLogger
 
-    Config.load_yaml("../config_server1.yaml")
+    Config.load_yaml("../config_server2.yaml")
 
     logger = XLogger(log_level="debug", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=logger)
