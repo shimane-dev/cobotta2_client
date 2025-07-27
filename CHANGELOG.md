@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2025.07.26, v0.0.7  nakada
+
+- 直接 target 座標を入れるテストサンプル追加、
+- テスト
+ 
 ## 2025.07.25, v0.0.6  nakada
 
 - fastapi_frame: v0.3.1
