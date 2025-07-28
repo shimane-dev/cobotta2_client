@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 """
-try_a_v02.py (version 0.0.4)
-
-frame 0.3.0
-cobotta 0.5.5
+cobotta1/cobotta2 の平行（同時）動作のサンプル
 
 Kengo NAKADA:
 https://github.com/shimane-dev, https://github.com/kengo-nakada
@@ -28,14 +25,18 @@ from x_logger import XLogger
 # @pytest.mark.asyncio
 async def main():
     logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    t1 = asyncio.create_task(c1(logger))
     t2 = asyncio.create_task(c2(logger))
-    await asyncio.gather(t2)
-    # await c2(logger)
+    # await asyncio.gather(t2)
+    await asyncio.gather(t1, t2)
 
 
 async def c1(
     logger: XLogger = None,
 ):
+    Config.load_yaml("config_server1.yaml")
+    client1 = AsyncCobottaClient(config=Config, logger=logger)
+    await client1.reset_error()
     pass
 
 

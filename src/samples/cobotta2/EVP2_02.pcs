@@ -1,0 +1,1 @@
+'!TITLE "EVP2(EasyVisionPicking2)テンプレート"Dim ctrl As ObjectSub Main	TakeArm Keep = 0	'ctrl = Cao.AddController("Runner", "CaoProv.DENSO.EVP2", "", "@IfnotMember")	'ctrl.LoadFile "try_camera")	Move P, P[105]	'ctrl.RunEnd Sub
