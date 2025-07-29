@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2025.07.29, v0.0.8  nakada
+
+- cobotta2 test からの tests を丸ごと投入
+- 研究室見学用のサンプル(try_a_COBOTTA1_v3.py)動作確認
+- バージョン確認しただけ
+
+- cobotta2 v0.5.20
+- fastapi_frame v0.3.2
+
 ## 2025.07.26, v0.0.7  nakada
 
 - 直接 target 座標を入れるテストサンプル追加、
