@@ -14,7 +14,7 @@ from x_logger.x_logger import XLogger
 
 
 if __name__ == "__main__":
-    Config.load_yaml("config_server2_state.yaml")
+    Config.load_yaml("../config_server2_state.yaml")
     logger = XLogger(
         log_level="debug",
         logger_name=Config.COBOTTA_SERVER_LOGGER_NAME,
