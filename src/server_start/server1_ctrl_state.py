@@ -6,16 +6,22 @@ kengo.nakada@mat.shimane-u.ac.jp, kengo.nakada@gmail.com
 """
 from cobotta2.config import Config
 from cobotta2.cobotta_ctrl_state import CobottaState
-from cobotta2.server_fastapi.routers import CobottaRouterState
-from cobotta2.server_fastapi.spec_state import cobotta_state_api_spec
+from cobotta2.server_fastapi import CobottaRouterState
+from cobotta2.server_fastapi import cobotta_state_api_spec
 
 from fastapi_frame.api_server import FastApiServer
 from x_logger.x_logger import XLogger
 
 
 if __name__ == "__main__":
-    Config.load_yaml("../config_server1_state.yaml")
-    logger = XLogger(log_level="debug", logger_name=Config.COBOTTA_SERVER_LOGGER_NAME)
+    Config.load_yaml("config_server1_state.yaml")
+    logger = XLogger(
+        log_level="debug",
+        logger_name=Config.COBOTTA_SERVER_LOGGER_NAME,
+        log_mode="rotate",
+        # log_mode="file",
+        log_name="c:/opt/log/cobotta2_server1_state.log",
+    )
 
     logger.info(f"COBOTTA IP = {Config.COBOTTA_IP}")
     logger.info(f"SERVER IP = {Config.SERVER_IP}")

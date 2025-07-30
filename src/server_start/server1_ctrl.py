@@ -6,20 +6,21 @@ kengo.nakada@mat.shimane-u.ac.jp, kengo.nakada@gmail.com
 """
 from cobotta2.config import Config
 from cobotta2.cobotta_ctrl import CobottaCtrl
-from cobotta2.server_fastapi.routers import CobottaRouterCtrl
-from cobotta2.server_fastapi.spec_ctrl import cobotta_ctrl_api_spec
+from cobotta2.server_fastapi import CobottaRouterCtrl
+from cobotta2.server_fastapi import cobotta_ctrl_api_spec
 
 from fastapi_frame.api_server import FastApiServer
 from x_logger.x_logger import XLogger
 
 
-def server_start():
-    Config.load_yaml("../config_server1.yaml")
+if __name__ == "__main__":
+    Config.load_yaml("config_server1.yaml")
     logger = XLogger(
         log_level="debug",
         logger_name=Config.COBOTTA_SERVER_LOGGER_NAME,
         log_mode="rotate",
-        log_name="c:/logs/cobotta_server.log",
+        # log_mode="file",
+        log_name="c:/opt/log/cobotta2_server1.log",
     )
 
     logger.info(f"COBOTTA IP = {Config.COBOTTA_IP}")
@@ -39,7 +40,3 @@ def server_start():
         lifespan_msg_prefix="COBOTTA",
     )
     server.run(host=Config.SERVER_IP, port=Config.SERVER_PORT)
-
-
-if __name__ == "__main__":
-    server_start()
