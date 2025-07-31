@@ -2,6 +2,14 @@
 
 ## 2025.07.31, v0.0.9  nakada
 
+### 動作環境
+
+- aandd_reader: v0.0.1
+- fastapi_frame: v0.3.4
+- cobotta2: v0.5.28
+
+### 内容
+
 - aandd_read 導入もろもろ、namespace 調整
 - camera P&P 動作版
 - camera P&P + 秤量
