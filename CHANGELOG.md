@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 2025.07.31, v0.0.10  nakada
+
+### 動作環境
+
+- aandd_reader: v0.0.1
+- fastapi_frame: v0.3.4
+- cobotta2: v0.5.28
+
+### 内容
+
+- cobotta1 / cobotta2 
+  - P&P + 秤量 ２台同時動作・計測
+
 ## 2025.07.31, v0.0.9  nakada
 
 ### 動作環境

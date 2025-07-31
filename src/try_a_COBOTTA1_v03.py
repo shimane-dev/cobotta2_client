@@ -26,10 +26,8 @@ from x_logger import XLogger
 
 # @pytest.mark.asyncio
 async def main():
-    Config.load_yaml("config_cobotta1.yaml")
-    logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
-
-    await worker(logger)
+    # await worker_cobotta1(logger)
+    await worker_cobotta1()
 
 
 async def hand_open(
@@ -175,10 +173,11 @@ async def reset_scale_zero(
     await client.move("P140", speed=speed)  #
 
 
-async def worker(
-    logger: XLogger = None,
-):
+async def worker_cobotta1():
     """"""
+    Config.load_yaml("config_cobotta1.yaml")
+    logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
+
     client = AsyncCobottaClient(config=Config, logger=logger)
     await client.reset_error()
 
