@@ -17,16 +17,15 @@ import logging
 # httpx のログを WARNING レベル以上にする（INFO を抑制）
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
-from cobotta2.config import Config
-from cobotta2.server_fastapi.clients import AsyncCobottaClient
-from cobotta2.server_fastapi.models.motion import MotionMode
+from cobotta2 import Config, MotionMode
+from cobotta2.server import AsyncCobottaClient
 from x_logger import XLogger
 
 
 # @pytest.mark.asyncio
 async def main():
-    Config.load_yaml("config_server1.yaml")
-    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    Config.load_yaml("config_cobotta1.yaml")
+    logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
 
     await worker(logger)
 

@@ -24,7 +24,7 @@ async def test_fastapi_Async_move_A_30():
 
     Config.load_yaml("config_server1.yaml")
 
-    _logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    _logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=_logger)
     await client.reset_error()
 

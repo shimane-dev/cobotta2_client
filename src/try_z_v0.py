@@ -25,24 +25,35 @@ from x_logger import XLogger
 # @pytest.mark.asyncio
 async def main():
     Config.load_yaml("config_server1.yaml")
-    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
 
     await worker(logger)
 
 
-async def hand_open(client, logger: XLogger = None,):
+async def hand_open(
+    client,
+    logger: XLogger = None,
+):
     # await client.hand_move_H(6, True)
     await client.hand_move_A(30, 100)
     # await asyncio.sleep(3)
 
 
-async def init(client, logger: XLogger = None,):
+async def init(
+    client,
+    logger: XLogger = None,
+):
     await hand_open(client, logger)
     await client.move("P120", bstrOpt="Speed=60")  # home
     await client.move("P121", bstrOpt="Speed=100")  # home
 
 
-async def pick_and_place(client, place: bool= False, pick: bool= False, logger: XLogger = None,):
+async def pick_and_place(
+    client,
+    place: bool = False,
+    pick: bool = False,
+    logger: XLogger = None,
+):
     if place:
         await client.hand_move_A(30, 100)
 
@@ -51,7 +62,11 @@ async def pick_and_place(client, place: bool= False, pick: bool= False, logger: 
     await asyncio.sleep(3)
 
 
-async def move_to_home(client, *, logger: XLogger = None,):
+async def move_to_home(
+    client,
+    *,
+    logger: XLogger = None,
+):
     """ """
     await client.move("P122", bstrOpt="Speed=100")
 

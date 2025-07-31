@@ -21,7 +21,7 @@ async def test_fastapi_state():
 
     Config.load_yaml("config_server1_state.yaml")
 
-    logger= XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     state = AsyncCobottaStateClient(config=Config, logger=logger)
 
     # while True:

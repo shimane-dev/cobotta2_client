@@ -21,7 +21,7 @@ async def test_fastapi_stop():
 
     Config.load_yaml("config_server1.yaml")
 
-    logger= XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=logger)
 
     # logger.info("== take arm()")

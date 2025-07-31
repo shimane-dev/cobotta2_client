@@ -24,7 +24,7 @@ async def main():
 
     Config.load_yaml("../config_server1.yaml")
 
-    _logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    _logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=_logger)
     # busy_status などの問い合わせは take arm しないほうがいい。
 

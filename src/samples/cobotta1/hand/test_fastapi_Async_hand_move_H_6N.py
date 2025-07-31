@@ -24,7 +24,7 @@ async def test_fastapi_Async_move_A_30():
 
     Config.load_yaml("../config_server1.yaml")
 
-    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=logger)
     await client.reset_error()
 
@@ -34,6 +34,6 @@ async def test_fastapi_Async_move_A_30():
     await client.hand_move_H(6, True)
     await asyncio.sleep(2)
 
-    # current_pos = await client.get_current_pos()
+    # current_pos = await client.get_current_position()
     # logger.info(f"current_position: {current_pos}")
     assert "result" == "result"

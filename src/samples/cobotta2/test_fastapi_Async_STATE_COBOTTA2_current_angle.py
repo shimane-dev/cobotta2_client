@@ -29,7 +29,7 @@ async def test_fastapi_state():
     config2 = Config("config_server2.yaml")
     config2_state = Config("config_server2_state.yaml")
 
-    logger = XLogger(log_level="info", logger_name=config2.COBOTTA_CLIENT_LOGGER_NAME)
+    logger = XLogger(log_level="info", logger_name=config2.CLIENT_LOGGER_NAME)
     client2 = AsyncCobottaClient(config=config2, logger=logger)
 
     # state2 は client に関係なく nonblocking で問い合わせが可能

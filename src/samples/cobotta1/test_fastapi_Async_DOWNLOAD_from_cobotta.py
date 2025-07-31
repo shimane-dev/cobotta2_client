@@ -23,7 +23,7 @@ async def test_fastapi_state():
 
     Config.load_yaml("config_server1.yaml")
 
-    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=logger)
     # busy_status などの問い合わせは take arm しないほうがいい。
 

@@ -16,10 +16,9 @@ async def test_fastapi_state():
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
     import time
-    from cobotta2.config import Config
-    from cobotta2.server_fastapi.clients import AsyncCobottaClient
-    from cobotta2.server_fastapi.models.motion import MotionMode
-    from x_logger.x_logger import XLogger
+    from cobotta2 import Config, MotionMode
+    from cobotta2.server import AsyncCobottaClient
+    from x_logger import XLogger
 
     Config.load_yaml("config_server2.yaml")
 
@@ -28,7 +27,7 @@ async def test_fastapi_state():
 
     Config.load_yaml("config_server2.yaml")
 
-    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=logger)
     ret = await client.reset_error()
     if ret is None or ret is False:

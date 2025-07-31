@@ -7,6 +7,7 @@ https://github.com/shimane-dev, https://github.com/kengo-nakada
 kengo.nakada@mat.shimane-u.ac.jp, kengo.nakada@gmail.com
 """
 import pytest
+import asyncio
 
 
 @pytest.mark.asyncio
@@ -23,7 +24,7 @@ async def test_fastapi_Async_test_1_2():
 
     Config.load_yaml("config_server2.yaml")
 
-    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=logger)
     await client.reset_error()
     await client.release_arm()
@@ -33,10 +34,29 @@ async def test_fastapi_Async_test_1_2():
     logger.info("--------- カメラポジションへ -----------------")
     await client.take_arm()
     await client.open_hand()
-    await client.move("P110", speed=100)
+
+    # await client.move("P110", speed=100)
+    # based on P110
+    P110_camera = (
+        197.74189325511722,  # X
+        -102.87065719423421,  # y
+        # 45.40395449388056,  # z
+        180.0,  # z
+        -176.46837944742447,  # rx
+        # 10.232977777915506,  # ry
+        0.0,
+        176.76296478619867,  # rz
+        261.0,
+    )
+    ret = await client.move(P110_camera, speed=100)
     ret = await client.reset_error()
     if ret is None or ret is False:
         assert False, "Connect Error"
+
+    logger.info("---------- Hand 初期位置移動 -------------------")
+    await client.init_hand()
+    await asyncio.sleep(1)
+    await client.release_arm()
 
     logger.info("---------- カメラで画像認識 -------------------")
     # name = "EVP2"
@@ -54,12 +74,26 @@ async def test_fastapi_Async_test_1_2():
     await client.wait_for_complete()
 
     logger.info("----------- 指先を９０度回転  --------------")
-    # client.drive_EX((6, -90))  # 相対
-    await client.rotate_H(-90.0)  # 相対
+    ret = await client.drive_EX((6, -90))  # 相対
+    # await client.rotate_H(-90.0)  # 相対
+    if not ret or ret is None:
+        # 開始状態によっては指の回転状態が異なるので -90 でエラーとなることがあるのでそのときは +90 でチャレンジ
+        await client.reset_error()
+        await client.release_arm()
+        await client.take_arm()
+        ret2 = await client.drive_EX((6, 90))  # 相対
+        if not ret2 or ret2 is None:
+            sys.exit(-1)
+
     await client.wait_for_complete()
 
     logger.info("----------- 近づく(offset-move)  --------------")
-    pos = client.get_current_pos()
+    pos = client.get_current_position()
+    # offset 付きの基本動作
+    # ret = client.move(pos, path_blend="@0", offset=(0, 0, -25), speed=30)
+    ret = client.move(pos, path_blend="@E", offset=(0, 0, -25), speed=30)
+    if not ret:
+        sys.exit(-1)  ## ここでぶつかる恐れがある
 
     ############### 基本動作テスト
     # client.cored_type = "P"

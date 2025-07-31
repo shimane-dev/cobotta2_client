@@ -28,7 +28,7 @@ async def test_fastapi_state():
 
     Config.load_yaml("config_server2.yaml")
 
-    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=logger)
     ret = await client.reset_error()
     if ret is None or ret is False:
@@ -36,7 +36,7 @@ async def test_fastapi_state():
 
     try:
         # busy_status などの問い合わせは take arm しないほうがいい。
-        current_pos = await client.get_current_pos()
+        current_pos = await client.get_current_position()
         logger.info(current_pos)
         logger.info(current_pos[:6])
 

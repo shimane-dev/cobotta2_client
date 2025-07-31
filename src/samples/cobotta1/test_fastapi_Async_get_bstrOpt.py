@@ -22,7 +22,7 @@ async def test_fastapi_state():
     from x_logger.x_logger import XLogger
 
     Config.load_yaml("config_server1.yaml")
-    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=logger)
 
     result = await client.get_bstrOpt()

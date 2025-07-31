@@ -20,19 +20,15 @@ async def test_fastapi_Async_move2_P2():
     # httpx のログを WARNING レベル以上にする（INFO を抑制）
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
-    from cobotta2.config import Config
-    from cobotta2.server_fastapi.clients import AsyncCobottaClient
-    from cobotta2.server_fastapi.models.motion import MotionMode
-    from x_logger.x_logger import XLogger
+    from cobotta2 import Config, MotionMode
+    from cobotta2.server import AsyncCobottaClient
+    from x_logger import XLogger
 
     Config.load_yaml("../config_server2.yaml")
-    Config.load_yaml("../config_server2_state.yaml")
 
-    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
-    state = AsyncCobottaStateClient(config=Config, logger=logger)
+    logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=logger)
-
-    # await client.reset_error()
+    await client.reset_error()
 
     # speed の入手などには take_arm が必要(アームごとのパラメータなので)
     logger.info("take_arm")
@@ -45,15 +41,17 @@ async def test_fastapi_Async_move2_P2():
     logger.info(f"motion_mode = {MotionMode.PTP}")
     client.motion_mode = MotionMode.PTP
 
-    num = f"P{100}"
+    num = f"P{110}"
     ret = await client.get_P(f"{num}")
     logger.info(f"== move({num}: {ret})")
 
-    ret = await client.move(f"@E {num}+(-12,-22,0)", bstrOpt=30)
+    # ret = await client.move(f"@E {num}+(-12,-22,0)", bstrOpt=30)
+    await client.move(f"@E {num}", speed=30)
+    await client.move(f"@0 {num}", offset=(0, 0, 50), speed=30)
     await client.wait_for_complete()
 
     assert ret is not None, "接続失敗"
 
-    current_pos = await client.get_current_pos()
+    current_pos = await client.get_current_position()
     logger.info(f"current_position: {current_pos}")
     assert "result" == "result"

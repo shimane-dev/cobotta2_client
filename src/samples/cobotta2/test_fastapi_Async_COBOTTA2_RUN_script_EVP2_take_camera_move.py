@@ -24,7 +24,7 @@ async def test_fastapi_Async_test_1_2():
 
     Config.load_yaml("config_server2.yaml")
 
-    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=logger)
     ret = await client.reset_error()
     if ret is None or ret is False:
@@ -63,7 +63,7 @@ async def test_fastapi_Async_test_1_2():
     await client.wait_for_complete()
 
     logger.info("----------- 近づく(offset-move)  --------------")
-    pos = client.get_current_pos()
+    pos = client.get_current_position()
 
     ############### 基本動作テスト
     # client.cored_type = "P"

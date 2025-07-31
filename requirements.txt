@@ -2,3 +2,4 @@ cobotta2
 x_logger
 fastapi_frame
 pyyaml
+pytest

@@ -16,15 +16,13 @@ async def test_fastapi_Async_move2_P2():
     # httpx のログを WARNING レベル以上にする（INFO を抑制）
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
-    from cobotta2.config import Config
-    from cobotta2.server_fastapi.clients import AsyncCobottaClient
-    from cobotta2.server_fastapi.models.motion import MotionMode
-    from cobotta2.server_fastapi.models.motion import MotionMode
-    from x_logger.x_logger import XLogger
+    from cobotta2 import Config, MotionMode
+    from cobotta2.server import AsyncCobottaClient
+    from x_logger import XLogger
 
     Config.load_yaml("config_server2.yaml")
 
-    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=logger)
     ret = await client.reset_error()
     if ret is None or ret is False:
@@ -36,6 +34,6 @@ async def test_fastapi_Async_move2_P2():
 
     logger.info(f"{num}: {ret}")
 
-    current_pos = await client.get_current_pos()
+    current_pos = await client.get_current_position()
     logger.info(f"current_position: {current_pos}")
     assert "result" == "result"

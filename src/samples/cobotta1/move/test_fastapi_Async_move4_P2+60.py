@@ -23,7 +23,7 @@ async def test_fastapi_Async_move1_P2():
 
     Config.load_yaml("../config_server1.yaml")
 
-    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
+    logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=logger)
     await client.reset_error()
 
@@ -40,7 +40,7 @@ async def test_fastapi_Async_move1_P2():
 
     # ########################
     # Current_position
-    current_pos = await client.get_current_pos()
+    current_pos = await client.get_current_position()
     logger.info(f"current_pos = {current_pos}")
 
     # # P2 <--PTP--> P3
@@ -86,6 +86,6 @@ async def test_fastapi_Async_move1_P2():
     # assert ret is not None, "接続失敗"
     # await cobotta.wait_for_complete()
 
-    # current_pos = cobotta.get_current_pos()
+    # current_pos = cobotta.get_current_position()
     # logger.info(f"current_position: {current_pos}")
     assert "result" == "result"

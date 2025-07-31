@@ -7,10 +7,7 @@ https://github.com/shimane-dev, https://github.com/kengo-nakada
 kengo.nakada@mat.shimane-u.ac.jp, kengo.nakada@gmail.com
 """
 import pytest
-
-from cobotta2.server_fastapi.clients.async_cobotta_state_client import (
-    AsyncCobottaStateClient,
-)
+from cobotta2.server import AsyncCobottaClient
 
 
 @pytest.mark.asyncio
@@ -20,26 +17,22 @@ async def test():
     # httpx のログを WARNING レベル以上にする（INFO を抑制）
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
-    from cobotta2.config import Config
-    from cobotta2.server_fastapi.clients import AsyncCobottaClient
-    from cobotta2.server_fastapi.models.motion import MotionMode
-    from x_logger.x_logger import XLogger
+    from cobotta2 import Config, MotionMode
+    from cobotta2.server import AsyncCobottaClient
+    from x_logger import XLogger
 
     Config.load_yaml("../config_server2.yaml")
-    Config.load_yaml("../config_server2_state.yaml")
 
-    logger = XLogger(log_level="info", logger_name=Config.COBOTTA_CLIENT_LOGGER_NAME)
-    state = AsyncCobottaStateClient(config=Config, logger=logger)
+    logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=logger)
+    await client.reset_error()
 
-    # await client.reset_error()
+    logger.info("turn_on_motor")
+    await client.turn_on_motor()
 
     # speed の入手などには take_arm が必要(アームごとのパラメータなので)
     logger.info("take_arm")
     ret = await client.take_arm()
-
-    logger.info("turn_on_motor")
-    await client.turn_on_motor()
 
     logger.info(f"motion_mode = {MotionMode.PTP}")
     client.motion_mode = MotionMode.PTP
@@ -47,12 +40,29 @@ async def test():
     ret = await client.get_P(f"P110")
     logger.info(f"== get_P(): {ret})")
 
-    ret = await client.move("P110")
+    # # ret = await client.move("P110")
+    # P110_camera = (
+    #     197.74189325511722,  # X
+    #     -102.87065719423421,  # y
+    #     # 45.40395449388056,  # z
+    #     180.0,  # z
+    #     -176.46837944742447,  # rx
+    #     # 10.232977777915506,  # ry
+    #     0.0,
+    #     176.76296478619867,  # rz
+    #     261.0,
+    # )
+    # ret = await client.move(P110_camera, speed=50)
+
+    # await client.move("P110", speed=50)
     # ret = await client.move(f"@E {num}+(-12,-22,0)", bstrOpt=30)
-    # await client.wait_for_complete()
+
+    await client.move(ret, speed=50)
+    await client.move(ret, path_blend="@0", offset=(0, 0, 40), speed=50)
+    await client.wait_for_complete()
 
     # assert ret is not None, "接続失敗"
 
-    # current_pos = await client.get_current_pos()
+    # current_pos = await client.get_current_position()
     # logger.info(f"current_position: {current_pos}")
     assert "result" == "result"

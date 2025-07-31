@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2025.07.31, v0.0.9  nakada
+
+- aandd_read 導入もろもろ、namespace 調整
+- camera P&P 動作版
+- camera P&P + 秤量
+
 ## 2025.07.29, v0.0.8  nakada
 
 - cobotta2 test からの tests を丸ごと投入
