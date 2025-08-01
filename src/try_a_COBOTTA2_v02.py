@@ -73,6 +73,7 @@ async def worker_cobotta2():
         speed=100,
     )
     if not ret or ret is None:
+        logger.error(f"{await client.error_description()}")
         sys.exit(-1)
 
     logger.info("---------- Hand 初期位置移動 -------------------")
@@ -121,8 +122,9 @@ async def worker_cobotta2():
     # await client.move("@E P10", offset=(0, 0, -5), speed=30)
     ret = await client.move("P10", path_blend="@E", speed=100)
     if not ret or ret is None:
-        logger.info("**Error**")
+        logger.error(f"{await client.error_description()}")
         sys.exit(-1)
+
     await client.wait_for_complete()
 
     logger.info("----------- 指先を９０度回転  --------------")
@@ -137,6 +139,7 @@ async def worker_cobotta2():
         await client.take_arm()
         ret2 = await client.drive_EX((6, 90))  # 相対
         if not ret2 or ret2 is None:
+            logger.error(f"{await client.error_description()}")
             sys.exit(-1)
 
     await client.wait_for_complete()
@@ -160,6 +163,7 @@ async def worker_cobotta2():
     # ret = client.move(pos, path_blend="@0", offset=(0, 0, -25), speed=30)
     ret = await client.move(pos, path_blend="@E", offset=(0, 0, -25), speed=100)
     if not ret:
+        logger.error(f"{await client.error_description()}")
         sys.exit(-1)  ## ここでぶつかる恐れがある
 
     # ret = await client.get_current_position()
@@ -170,7 +174,9 @@ async def worker_cobotta2():
     ret = await client.hand_move_H(8, True)
     # ret = await client.hand(force=8)
     if not ret:
+        logger.error(f"{await client.error_description()}")
         sys.exit(-1)
+
     await client.wait_for_complete()
     await asyncio.sleep(2)
 
@@ -206,20 +212,22 @@ async def worker_cobotta2():
 
     await asyncio.sleep(0.5)
 
-    # 少しハンドの意図を下げる
+    # 少しハンドの位置を下げる
     current = await client.get_current_position()
     ret = await client.move(
         current,
         path_blend="@E",
-        offset=(0, 0, 2),
-        speed=500,
+        offset=(0, 0, -2),
+        speed=100,
     )
 
     logger.info("----------- つかむ  --------------")
     ret = await client.hand_move_H(7, True)
     # ret = await client.hand(forece=8)
     if not ret:
+        logger.error(f"{await client.error_description()}")
         sys.exit(-1)
+
     await client.wait_for_complete()
     await asyncio.sleep(2)
 

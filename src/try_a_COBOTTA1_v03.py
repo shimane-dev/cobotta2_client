@@ -101,7 +101,7 @@ async def process_in_shield(
     *,
     place: bool = False,
     pick: bool = False,
-    speed: int = None,
+    speed: int | None = None,
     logger: XLogger = None,
 ):
     """
@@ -134,13 +134,59 @@ async def process_in_shield(
         # Pick
         await client.hand_move_H(6, True)
         await asyncio.sleep(3)  # 重要
-        await client.move("P129", path_blend="@0", offset=(0, 0, 10), speed=speed)
 
+        # 上にあげる
+        await client.move(
+            "P129",
+            path_blend="@0",
+            offset=(0, 0, 30),
+            speed=speed,
+        )
+
+    new_P130 = [
+        276.0450426396214,
+        38.839590488460324,
+        # 97.69473180302617,
+        120,
+        177.80716919910708,
+        3.5715102321743966,
+        -171.31186286176393,
+        261.0,
+    ]
+    await client.move(
+        new_P130,
+        motion_mode=MotionMode.LINE,
+        path_blend="@0",
+        offiset=(0, 0, 20),
+        speed=speed,
+    )
     # 外にひく1
-    await client.move("P130", offiset=(0, 0, 10), speed=speed)
+    # await client.move(
+    #     "P130",
+    #     motion_mode=MotionMode.LINE,
+    #     path_blend="@0",
+    #     offiset=(0, 0, 30),
+    #     speed=speed,
+    # )
+    # ret = await client.get_current_position()
+    # print(ret)
+    # sys.exit(-1)
 
-    await client.move("P131", speed=speed)  # ひく(まだ風防のなかに指先がある)
-    await client.move("P132", speed=speed)  # ひく(これで一応完全に外)
+    await client.move(
+        "P131",
+        motion_mode=MotionMode.LINE,
+        path_blend="@0",
+        offiset=(0, 0, 25),
+        speed=speed,
+    )  # ひく(まだ風防のなかに指先がある)
+
+    await client.move(
+        "P132",
+        motion_mode=MotionMode.LINE,
+        path_blend="@0",
+        offiset=(0, 0, 25),
+        speed=speed,
+    )  # ひく(これで一応完全に外)
 
     # 他のところに行けるような位置まで移動
     await client.move("P133", speed=speed)
