@@ -66,7 +66,12 @@ async def worker_cobotta2():
     # )
     # ret = await client.move(P110_camera, speed=50)
     pos_P110 = await client.get_current_position()
-    await client.move("P110", path_blend="@E", motion_mode=MotionMode.LINE, speed=100)
+    await client.move(
+        "P110",
+        path_blend="@E",
+        motion_mode=MotionMode.LINE,
+        speed=100,
+    )
     if not ret or ret is None:
         sys.exit(-1)
 
@@ -114,7 +119,10 @@ async def worker_cobotta2():
     await client.take_arm()
     # await client.move("P10+(0,0,-5)", speed=30)
     # await client.move("@E P10", offset=(0, 0, -5), speed=30)
-    await client.move("P10", path_blend="@E", speed=100)
+    ret = await client.move("P10", path_blend="@E", speed=100)
+    if not ret or ret is None:
+        logger.info("**Error**")
+        sys.exit(-1)
     await client.wait_for_complete()
 
     logger.info("----------- 指先を９０度回転  --------------")
@@ -160,6 +168,7 @@ async def worker_cobotta2():
 
     logger.info("----------- つかむ  --------------")
     ret = await client.hand_move_H(8, True)
+    # ret = await client.hand(force=8)
     if not ret:
         sys.exit(-1)
     await client.wait_for_complete()
@@ -179,7 +188,7 @@ async def worker_cobotta2():
     # await client.move("P120", motion_mode=MotionMode.LINE, speed=50)
     await client.move(
         "P121",
-        offset=(0, 0, 0.2),  # up
+        offset=(0, 0, 2),  # up
         motion_mode=MotionMode.LINE,
         speed=100,
     )
@@ -197,8 +206,18 @@ async def worker_cobotta2():
 
     await asyncio.sleep(0.5)
 
+    # 少しハンドの意図を下げる
+    current = await client.get_current_position()
+    ret = await client.move(
+        current,
+        path_blend="@E",
+        offset=(0, 0, 2),
+        speed=500,
+    )
+
     logger.info("----------- つかむ  --------------")
-    ret = await client.hand_move_H(8, True)
+    ret = await client.hand_move_H(7, True)
+    # ret = await client.hand(forece=8)
     if not ret:
         sys.exit(-1)
     await client.wait_for_complete()
@@ -212,14 +231,19 @@ async def worker_cobotta2():
     await client.move("P111", motion_mode=MotionMode.LINE, speed=100)
 
     # Place
-    await client.move("P122", motion_mode=MotionMode.LINE, speed=100)
+    await client.move(
+        "P122",
+        offset=(0, 0, 13),
+        motion_mode=MotionMode.LINE,
+        speed=100,
+    )
     await client.open_hand()
     await asyncio.sleep(0.5)
 
     # move to home
     await client.move(
         "P110",
-        offset=(0, 0, 0.2),  # up
+        offset=(0, 0, 13),  # up
         motion_mode=MotionMode.LINE,
         speed=100,
     )
