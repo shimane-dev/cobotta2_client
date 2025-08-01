@@ -18,7 +18,7 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 # import time
 
 from aandd_reader import AsyncAanddReaderClient
-from cobotta2 import Config, MotionMode
+from cobotta2 import Config, MotionMode, CobottaVarManager
 from cobotta2.server import AsyncCobottaClient
 
 from x_logger import XLogger
@@ -48,6 +48,8 @@ async def worker_cobotta2():
 
     await client.turn_on_motor()
 
+    v = CobottaVarManager(cobotta=client, logger=logger)
+
     logger.info("--------- カメラポジションへ -----------------")
     await client.take_arm()
     await client.open_hand()
@@ -65,8 +67,10 @@ async def worker_cobotta2():
     #     261.0,
     # )
     # ret = await client.move(P110_camera, speed=50)
-    pos_P110 = await client.get_current_position()
+    # pos_P110 = await client.get_current_position()
+    v.get_cobotta("P110")
     await client.move(
+        # v.P110,
         "P110",
         path_blend="@E",
         motion_mode=MotionMode.LINE,

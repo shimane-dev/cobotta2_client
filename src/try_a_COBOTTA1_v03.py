@@ -36,7 +36,8 @@ async def hand_open(
     logger: XLogger = None,
 ):
     # await client.hand_move_H(6, True)
-    await client.hand_move_A(30, 100)
+    # await client.hand_move_A(30, 100)
+    await client.hand(pos=30, speed=100)
     # await asyncio.sleep(3)
 
 
@@ -57,10 +58,12 @@ async def pick_and_place(
     logger: XLogger = None,
 ):
     if place:
-        await client.hand_move_A(30, 100)
+        # await client.hand_move_A(30, 100)
+        await client.hand(pos=30, speed=100)
 
     if pick:
-        await client.hand_move_H(6, True)
+        # await client.hand_move_H(6, True)
+        await client.hand(force=6)
     await asyncio.sleep(3)
 
 
@@ -127,12 +130,14 @@ async def process_in_shield(
 
     if place:
         # Place
-        await client.hand_move_A(30, 100)
+        # await client.hand_move_A(30, 100)
+        await client.hand(pos=30, speed=100)
         await client.move("P129", path_blend="@0", offset=(0, 0, 5), speed=speed)
 
     if pick:
         # Pick
-        await client.hand_move_H(6, True)
+        # await client.hand_move_H(6, True)
+        await client.hand(force=6)
         await asyncio.sleep(3)  # 重要
 
         # 上にあげる
