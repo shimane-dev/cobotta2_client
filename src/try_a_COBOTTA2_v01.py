@@ -63,14 +63,30 @@ async def worker_cobotta2():
     await asyncio.sleep(1)
     await client.release_arm()
 
-    logger.info("---------- カメラで画像認識 -------------------")
-    # pac_script_name = "EVP2_03.pcs"
-    # evp_script_name = "try_camera"
-    # file_content = client.make_file_content(evp_script_name)
-    await client.take_camera("try_camera", "EVP2_03.pcs")
-    await client.run_script()
-    await client.wait_for_complete()
-    logger.info(f"Result: {client.P10}")
+    # 画像認識の結果記録を初期化
+    client.I2 = 0
+    client.P10 = client.get_current_position()
+
+    # この挙動は画像モデルによって異なる(参照する変数とか)ので注意
+    while True:
+        logger.info("---------- カメラで画像認識 -------------------")
+        # pac_script_name = "EVP2_03.pcs"
+        # evp_script_name = "try_camera"
+        # file_content = client.make_file_content(evp_script_name)
+        await client.take_camera("try_camera", "EVP2_03.pcs")
+        await client.run_script()
+        await client.wait_for_complete()
+        logger.info(f"Result: {client.P10}")
+        logger.info(f"Result: {client.P10}")
+        if client.I2 == 1:
+            break
+        logger.error(f"*** ターゲットが見つけられません ***")
+        logger.error(f"*** 3sec 後に retry します ***")
+        await asyncio.sleep(3)
+
+    logger.error(f"***")
+    logger.info(f"Result(work): {client.P10}")
+    logger.error(f"***")
 
     #   sys.exit(-1)
     # Result = (

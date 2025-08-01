@@ -75,14 +75,29 @@ async def worker_cobotta2():
     await asyncio.sleep(1)
     await client.release_arm()
 
-    logger.info("---------- カメラで画像認識 -------------------")
-    # pac_script_name = "EVP2_03.pcs"
-    # evp_script_name = "try_camera"
-    # file_content = client.make_file_content(evp_script_name)
-    await client.take_camera("try_camera", "EVP2_03.pcs")
-    await client.run_script()
-    await client.wait_for_complete()
-    logger.info(f"Result: {client.P10}")
+    # 画像認識の結果記録を初期化
+    client.I2 = 0
+    client.P10 = client.get_current_position()
+
+    # この挙動は画像モデルによって異なる(参照する変数とか)ので注意
+    while True:
+        logger.info("---------- カメラで画像認識 -------------------")
+        # pac_script_name = "EVP2_03.pcs"
+        # evp_script_name = "try_camera"
+        # file_content = client.make_file_content(evp_script_name)
+        await client.take_camera("try_camera", "EVP2_03.pcs")
+        await client.run_script()
+        await client.wait_for_complete()
+        logger.info(f"Result: {client.P10}")
+        if client.I2 == 1:
+            break
+        logger.error(f"*** ターゲットが見つけられません ***")
+        logger.error(f"*** 3sec 後に retry します ***")
+        await asyncio.sleep(3)
+
+    logger.error(f"***")
+    logger.info(f"Result(work): {client.P10}")
+    logger.error(f"***")
 
     #   sys.exit(-1)
     # Result = (
@@ -99,7 +114,7 @@ async def worker_cobotta2():
     await client.take_arm()
     # await client.move("P10+(0,0,-5)", speed=30)
     # await client.move("@E P10", offset=(0, 0, -5), speed=30)
-    await client.move("P10", path_blend="@E", speed=30)
+    await client.move("P10", path_blend="@E", speed=100)
     await client.wait_for_complete()
 
     logger.info("----------- 指先を９０度回転  --------------")
@@ -135,7 +150,7 @@ async def worker_cobotta2():
     pos = await client.get_current_position()
     # offset 付きの基本動作
     # ret = client.move(pos, path_blend="@0", offset=(0, 0, -25), speed=30)
-    ret = await client.move(pos, path_blend="@E", offset=(0, 0, -25), speed=30)
+    ret = await client.move(pos, path_blend="@E", offset=(0, 0, -25), speed=100)
     if not ret:
         sys.exit(-1)  ## ここでぶつかる恐れがある
 
@@ -154,15 +169,20 @@ async def worker_cobotta2():
     # client.move("P10", offset=(0, 0, -15), speed=30)
 
     logger.info("----------- 移動 --------------")
-    await client.move("P111", motion_mode=MotionMode.LINE, speed=50)
-    await client.move("P112", motion_mode=MotionMode.LINE, speed=50)
-    await client.move("P113", motion_mode=MotionMode.LINE, speed=50)
+    await client.move("P111", motion_mode=MotionMode.LINE, speed=100)
+    await client.move("P112", motion_mode=MotionMode.LINE, speed=100)
+    await client.move("P113", motion_mode=MotionMode.LINE, speed=100)
     ##  client.move("P114", motion_mode=MotionMode.LINE, speed=50)
     ##  client.move("P117", motion_mode=MotionMode.LINE, speed=50)
     ##  client.move("P118", motion_mode=MotionMode.LINE, speed=50) # だめ
-    await client.move("P119", motion_mode=MotionMode.LINE, speed=50)
+    await client.move("P119", motion_mode=MotionMode.LINE, speed=100)
     # await client.move("P120", motion_mode=MotionMode.LINE, speed=50)
-    await client.move("P121", motion_mode=MotionMode.LINE, speed=50)
+    await client.move(
+        "P121",
+        offset=(0, 0, 0.2),  # up
+        motion_mode=MotionMode.LINE,
+        speed=100,
+    )
     await client.wait_for_complete()
 
     ########################################
@@ -186,18 +206,23 @@ async def worker_cobotta2():
 
     logger.info("----------- 帰宅 --------------")
     # await client.move("P120", motion_mode=MotionMode.LINE, speed=50)
-    await client.move("P119", motion_mode=MotionMode.LINE, speed=50)
-    await client.move("P113", motion_mode=MotionMode.LINE, speed=50)
-    await client.move("P112", motion_mode=MotionMode.LINE, speed=50)
-    await client.move("P111", motion_mode=MotionMode.LINE, speed=50)
+    await client.move("P119", motion_mode=MotionMode.LINE, speed=100)
+    await client.move("P113", motion_mode=MotionMode.LINE, speed=100)
+    await client.move("P112", motion_mode=MotionMode.LINE, speed=100)
+    await client.move("P111", motion_mode=MotionMode.LINE, speed=100)
 
     # Place
-    await client.move("P122", motion_mode=MotionMode.LINE, speed=50)
+    await client.move("P122", motion_mode=MotionMode.LINE, speed=100)
     await client.open_hand()
     await asyncio.sleep(0.5)
 
     # move to home
-    await client.move("P110", motion_mode=MotionMode.LINE, speed=50)
+    await client.move(
+        "P110",
+        offset=(0, 0, 0.2),  # up
+        motion_mode=MotionMode.LINE,
+        speed=100,
+    )
 
 
 if __name__ == "__main__":
