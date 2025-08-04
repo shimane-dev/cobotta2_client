@@ -30,25 +30,32 @@ async def main():
     await worker_cobotta1()
 
 
+async def error_exit(client, logger):
+    await client.error_description()
+    sys.exit(-1)
+
+
 async def hand_open(
     client,
     speed: int = None,
     logger: XLogger = None,
-):
+) -> bool:
     # await client.hand_move_H(6, True)
     # await client.hand_move_A(30, 100)
-    await client.hand(pos=30, speed=100)
+    ret = await client.hand(pos=30, speed=100)
     # await asyncio.sleep(3)
+    return ret
 
 
 async def init(
     client,
     speed: int = None,
     logger: XLogger = None,
-):
+) -> bool:
     await hand_open(client, logger)
     await client.move("P120", speed=speed)  # home
     await client.move("P121", speed=speed)  # home
+    return True
 
 
 async def pick_and_place(
@@ -56,7 +63,7 @@ async def pick_and_place(
     place: bool = False,
     pick: bool = False,
     logger: XLogger = None,
-):
+) -> bool:
     if place:
         # await client.hand_move_A(30, 100)
         await client.hand(pos=30, speed=100)
@@ -65,6 +72,7 @@ async def pick_and_place(
         # await client.hand_move_H(6, True)
         await client.hand(force=6)
     await asyncio.sleep(3)
+    return True
 
 
 async def move_to_home(
@@ -72,9 +80,10 @@ async def move_to_home(
     *,
     speed: int = None,
     logger: XLogger = None,
-):
+) -> bool:
     """ """
     await client.move("P122", speed=speed)
+    return True
 
 
 async def approach_to_sample(
@@ -82,10 +91,13 @@ async def approach_to_sample(
     *,
     speed: int = None,
     logger: XLogger = None,
-):
+) -> bool:
     # sample の直上へ
-    await client.move("P123", speed=speed)  # もっと近く
+    ret = await client.move("P123", speed=speed)  # もっと近く
+    if not ret:
+        await error_exit(client, logger)
     await client.wait_for_complete()
+    return True
 
 
 async def move_to_scale(
@@ -93,10 +105,14 @@ async def move_to_scale(
     *,
     speed: int = None,
     logger: XLogger = None,
-):
-    await client.move("P124", speed=speed)  # 持ち上げたところ
+) -> bool:
+    ret = await client.move("P124", speed=speed)  # 持ち上げたところ
+    if not ret:
+        await error_exit(client, logger)
+
     await client.move("P125", speed=speed)  #
     await client.move("P126", speed=speed)  #
+    return True
 
 
 async def process_in_shield(
@@ -106,7 +122,7 @@ async def process_in_shield(
     pick: bool = False,
     speed: int | None = None,
     logger: XLogger = None,
-):
+) -> bool:
     """
     風防のなかに突入して place する
 
@@ -121,7 +137,9 @@ async def process_in_shield(
 
     """
     # 突入(風防をまたぐ)
-    await client.move("P127", speed=speed)  #
+    ret = await client.move("P127", speed=speed)  #
+    if not ret:
+        await error_exit(client, logger)
 
     # in shield
     # Approach
@@ -197,6 +215,7 @@ async def process_in_shield(
     await client.move("P133", speed=speed)
     # 外でアームを回転させて home へ移動しようとしている
     await client.move("P134", speed=speed)  # もうすこし安全まで移動
+    return True
 
 
 async def reset_scale_zero(
@@ -204,9 +223,12 @@ async def reset_scale_zero(
     *,
     speed: int = None,
     logger: XLogger = None,
-):
+) ->bool:
     """Motion は Line 想定"""
-    await client.move("P135", speed=speed)  # 準備
+    ret = await client.move("P135", speed=speed)  # 準備
+    if not ret:
+        await error_exit(client, logger)
+
     await client.move("P136", speed=speed)  # 準備
 
     await client.move("P137", speed=speed)  # ボタンの直情
@@ -222,6 +244,7 @@ async def reset_scale_zero(
 
     await client.move("P139", speed=speed)  # 直情退避
     await client.move("P140", speed=speed)  #
+    return True
 
 
 async def worker_cobotta1():
@@ -238,10 +261,15 @@ async def worker_cobotta1():
         if ret is None:
             sys.exit(-1)
 
-        await client.turn_on_motor()
+        ret = await client.turn_on_motor()
+        if not ret:
+            await error_exit(client, logger)
+
         await client.set_speed(100)
 
-        await hand_open(client)
+        ret = await hand_open(client)
+        if not ret:
+            await error_exit(client, logger)
 
         client.motion_mode = MotionMode.PTP
         await init(client)  # init
