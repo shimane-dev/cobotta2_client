@@ -11,20 +11,21 @@ import pytest
 @pytest.mark.asyncio
 async def test_fastapi_Async_test_1_2():
     import logging
+    import re
+    import json
+    from datetime import datetime
+    from pathlib import Path
 
     # httpx のログを WARNING レベル以上にする（INFO を抑制）
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
-    import time
-    import re
-    import json
-    from datetime import datetime
-    import logging
-    from cobotta2.config import Config
-    from cobotta2.server_fastapi.clients import AsyncCobottaClient
-    from x_logger.x_logger import XLogger
+    from cobotta2 import Config
+    from cobotta2.server import AsyncCobottaClient
+    from x_logger import XLogger
 
-    Config.load_yaml("../config_server1.yaml")
+    HERE = Path(__file__).parent
+    Config.load_yaml(HERE / "../config_cobotta1.yaml")
+    # Config.load_yaml("../config_cobotta1.yaml")
 
     logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=logger)
@@ -62,7 +63,7 @@ async def test_fastapi_Async_test_1_2():
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(memory, f, ensure_ascii=True, indent=4)
 
-    time.sleep(0.1)
+    await asyncio.sleep(0.1)
 
     assert "result" == "result"
     # send_command("unknown")  # これはエラーになる

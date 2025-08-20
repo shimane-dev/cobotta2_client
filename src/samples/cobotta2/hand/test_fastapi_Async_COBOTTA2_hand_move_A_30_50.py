@@ -11,29 +11,32 @@ import pytest
 @pytest.mark.asyncio
 async def test_fastapi_state():
     import logging
+    import asyncio
+    from pathlib import Path
 
     # httpx のログを WARNING レベル以上にする（INFO を抑制）
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
-    import time
-    from cobotta2.config import Config
-    from cobotta2.server_fastapi.clients import AsyncCobottaClient
-    from cobotta2.server_fastapi.models.motion import MotionMode
-    from x_logger.x_logger import XLogger
+    from cobotta2 import Config, MotionMode
+    from cobotta2.server import AsyncCobottaClient
+    from x_logger import XLogger
 
-    Config.load_yaml("../config_server2.yaml")
+    HERE = Path(__file__).parent
+    Config.load_yaml(HERE / "../config_cobotta2.yaml")
+    # Config.load_yaml("../config_cobotta2.yaml")
 
     print(f"SERVER IP:{Config.SERVER_IP}")
     print(f"SERVER PORT:{Config.SERVER_PORT}")
 
-    Config.load_yaml("../config_server2.yaml")
+    Config.load_yaml("../config_cobotta2.yaml")
 
     logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=logger)
 
     try:
         # busy_status などの問い合わせは take arm しないほうがいい。
-        ret = await client.hand_move_A(30, speed=50)
+        # ret = await client.hand_move_A(30, speed=50)
+        ret = await client.hand(pos=30, speed=50)
     except Exception as e:
         print(e)
     assert "result" == "result"

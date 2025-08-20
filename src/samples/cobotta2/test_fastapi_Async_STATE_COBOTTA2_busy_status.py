@@ -11,15 +11,19 @@ import pytest
 @pytest.mark.asyncio
 async def test_fastapi_state():
     import logging
+    import asyncio
+    from pathlib import Path
 
     # httpx のログを WARNING レベル以上にする（INFO を抑制）
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
-    from cobotta2.config import Config
-    from cobotta2.server_fastapi.clients import AsyncCobottaStateClient
-    from x_logger.x_logger import XLogger
+    from cobotta2 import Config
+    from cobotta2.server import AsyncCobottaClient
+    from x_logger import XLogger
 
-    Config.load_yaml("config_server2_state.yaml")
+    HERE = Path(__file__).parent
+    Config.load_yaml(HERE / "config_cobotta2_state.yaml")
+    # Config.load_yaml("config_cobotta2_state.yaml")
 
     logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     state = AsyncCobottaStateClient(config=Config, logger=logger)

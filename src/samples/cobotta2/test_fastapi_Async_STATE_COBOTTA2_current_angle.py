@@ -16,18 +16,21 @@ from cobotta2.server_fastapi.clients.async_cobotta_state_client import (
 async def test_fastapi_state():
     import sys
     import logging
+    import asyncio
+    from pathlib import Path
 
     # httpx のログを WARNING レベル以上にする（INFO を抑制）
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
-    import time
-    from cobotta2.config import Config
-    from cobotta2.server_fastapi.clients import AsyncCobottaClient
-    from cobotta2.server_fastapi.models.motion import MotionMode
-    from x_logger.x_logger import XLogger
+    from cobotta2 import Config, MotionMode
+    from cobotta2.server import AsyncCobottaClient
+    from x_logger import XLogger
 
-    config2 = Config("config_server2.yaml")
-    config2_state = Config("config_server2_state.yaml")
+    HERE = Path(__file__).parent
+    config2 = Config(HERE / "config_cobotta2.yaml")
+    config2_state = Config(HERE / "config_cobotta2_state.yaml")
+    # config2 = Config("config_cobotta2.yaml")
+    # config2_state = Config("config_cobotta2_state.yaml")
 
     logger = XLogger(log_level="info", logger_name=config2.CLIENT_LOGGER_NAME)
     client2 = AsyncCobottaClient(config=config2, logger=logger)
@@ -43,7 +46,7 @@ async def test_fastapi_state():
         result = await client2.current_angle()
         logger.info(type(result))
         logger.info(result)
-        time.sleep(0.5)
+        await asyncio.sleep(0.5)
     except Exception as e:
         print(e)
     assert "result" == "result"

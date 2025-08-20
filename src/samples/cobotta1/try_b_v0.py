@@ -9,6 +9,7 @@ kengo.nakada@mat.shimane-u.ac.jp, kengo.nakada@gmail.com
 """
 # import pytest
 import asyncio
+from pathlib import Path
 import multiprocessing
 
 import logging
@@ -16,15 +17,17 @@ import logging
 # httpx のログを WARNING レベル以上にする（INFO を抑制）
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
-from cobotta2.config import Config
-from cobotta2.server_fastapi.clients import AsyncCobottaClient
-from cobotta2.server_fastapi.models.motion import MotionMode
+from cobotta2 import Config, MotionMode
+from cobotta2.server import AsyncCobottaClient
 from x_logger import XLogger
 
 
 # @pytest.mark.asyncio
 async def main():
-    Config.load_yaml("config_server1.yaml")
+    HERE = Path(__file__).parent
+    Config.load_yaml(HERE / "config_cobotta1.yaml")
+    # Config.load_yaml("config_cobotta1.yaml")
+
     logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
 
     await worker(logger)
@@ -35,7 +38,8 @@ async def hand_open(
     logger: XLogger = None,
 ):
     # await client.hand_move_H(6, True)
-    await client.hand_move_A(30, 100)
+    # await client.hand_move_A(30, 100)
+    await client.hand(pos=30, speed=100)
     # await asyncio.sleep(3)
 
 
@@ -55,10 +59,12 @@ async def pick_and_place(
     logger: XLogger = None,
 ):
     if place:
-        await client.hand_move_A(30, 100)
+        # await client.hand_move_A(30, 100)
+        await client.hand(pos=30, speed=100)
 
     if pick:
-        await client.hand_move_H(6, True)
+        # await client.hand_move_H(6, True)
+        await client.hand(force=6)
     await asyncio.sleep(3)
 
 

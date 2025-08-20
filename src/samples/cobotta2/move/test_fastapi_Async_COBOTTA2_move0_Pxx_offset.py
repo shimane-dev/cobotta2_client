@@ -16,6 +16,7 @@ from cobotta2.server_fastapi.clients.async_cobotta_state_client import (
 @pytest.mark.asyncio
 async def test_fastapi_Async_move2_P2():
     import logging
+    from pathlib import Path
 
     # httpx のログを WARNING レベル以上にする（INFO を抑制）
     logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -24,7 +25,9 @@ async def test_fastapi_Async_move2_P2():
     from cobotta2.server import AsyncCobottaClient
     from x_logger import XLogger
 
-    Config.load_yaml("../config_server2.yaml")
+    HERE = Path(__file__).parent
+    Config.load_yaml(HERE / "../config_cobotta2.yaml")
+    # Config.load_yaml("../config_cobotta2.yaml")
 
     logger = XLogger(log_level="info", logger_name=Config.CLIENT_LOGGER_NAME)
     client = AsyncCobottaClient(config=Config, logger=logger)
